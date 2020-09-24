@@ -1,6 +1,6 @@
-# clo
+# klo
 
-FIXME: description
+`klo` is a tool for building and deploying Clojure applications to Kubernetes. Inspired by [Google Ko](https://github.com/google/ko)
 
 ## Installation
 
@@ -10,7 +10,11 @@ Download from http://example.com/FIXME.
 
 FIXME: explanation
 
-    $ java -jar clo-0.1.0-standalone.jar [args]
+    $ java -jar klo-0.1.0-standalone.jar [args]
+
+### `klo publish`
+
+
 
 ## Options
 
