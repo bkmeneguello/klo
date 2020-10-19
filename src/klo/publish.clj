@@ -123,10 +123,10 @@
 
 (defn execute
   [opts]
-  (-> opts
-      create
-      download
-      configure
-      build
-      publish
-      cleanup))
+  (let [project (create opts)]
+    (try (-> project
+             download
+             configure
+             build
+             publish)
+         (finally (cleanup project)))))
