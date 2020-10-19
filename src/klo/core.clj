@@ -26,7 +26,12 @@
                   :default 3
                   :option  "vebosity"
                   :short   "v"
-                  :type    :int}]
+                  :type    :int}
+                 {:as      "Suppress any progress output. Best suited for scripts"
+                  :default false
+                  :option  "quiet"
+                  :short   "q"
+                  :type    :with-flag}]
    :subcommands    [{:command     "publish"
                      :description "This sub-command builds the provided Clojure projects into uberjars, containerizes them, and publishes them."
                      :opts [{:as "Project Path"
@@ -57,9 +62,10 @@
   "Check command line arguments for verbosity value and setup ROOT logger"
   [args]
   (let [commandline (:commandline (cli/parse-command-line args CONFIGURATION))
+        quiet (:quiet commandline)
         verbosity (:vebosity commandline)
         level (cond
-                (= verbosity 0) (Level/OFF)
+                (or quiet (= verbosity 0)) (Level/OFF)
                 (= verbosity 1) (Level/ERROR)
                 (= verbosity 2) (Level/WARN)
                 (= verbosity 3) (Level/INFO)
