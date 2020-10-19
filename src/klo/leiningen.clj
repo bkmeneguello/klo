@@ -5,7 +5,7 @@
             [clojure.string :as str]
             [clojure.tools.logging :as log])
   (:import (java.nio.file Path Files)
-           (java.io BufferedReader StringReader)))
+           (java.io BufferedReader StringReader IOException)))
 
 (defn- project-clj
   [^Path path]
@@ -15,11 +15,19 @@
   [^Path path]
   (Files/isReadable (project-clj path)))
 
+(defn- leiningen
+  []
+  (some #(try (-> (shell/sh % "lein")
+                  :out
+                  str/trim)
+              (catch IOException _ nil))
+        ["which" "where"]))
+
 (defn- uberjar!
   [^Path path]
   (let [current-env (into {} (System/getenv))]
     (log/infof "Building %s" path)
-    (->> (shell/sh "lein" "uberjar" ;;TODO: allow other tasks
+    (->> (shell/sh (leiningen) "uberjar" ;;TODO: allow other tasks
                    :dir (.toFile path)
                    :env (dissoc current-env "CLASSPATH"))
          :out
