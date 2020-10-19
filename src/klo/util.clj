@@ -11,5 +11,5 @@
   (symbol s))
 
 (defn as-path
-  [filename]
-  (Paths/get filename (into-array String [])))
+  [path & more]
+  (Paths/get path (into-array String more)))
