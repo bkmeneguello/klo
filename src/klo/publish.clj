@@ -43,8 +43,7 @@
                                parse-git-ssh-uri
                                parse-github-repo])]
              {:uri uri}
-             {:path (as-path path)})
-           (config/get :key :default))))
+             {:path (as-path path)}))))
 
 (def ^:private known-archives
   ["zip" "bz2" "gz" "tar" "tgz" "tbz" "txz"])
@@ -76,13 +75,14 @@
    If the URL is a Git remote, the project is cloned.
    If the URL is a known compressed file, it's downloaded and extracted to a 
    temporary location."
-  [{:keys [^java.net.URI uri ^java.io.File path] :as project}]
-  (when (and uri (not (and path (Files/isReadable path))))
-    (merge project
-           {:path (cond
-                    (downloadable-artifact? uri) (download-artifact uri)
-                    :else (clone-repository uri))
-            :temp? true})))
+  [{:keys [^java.net.URI uri ^Path path] :as project}]
+  (cond (and uri (not path))
+        (merge project
+               {:path (cond
+                        (downloadable-artifact? uri) (download-artifact uri)
+                        :else (clone-repository uri))
+                :temp? true})
+        :else project))
 
 (defn- configure
   "The local path is checked for a valid Clojure project (currently only 
@@ -98,13 +98,15 @@
                   :else (throw (ex-info "The path is not a know project" project)))
         project-config (config/get :key (str->symbol (:name project)) :path path)]
     (cond-> project
-      project-config (merge project-config))))
+      (:exists project-config) (merge project-config))))
 
 (defn- build
   "The project is built to produce a runnable standalone JAR file.
    @see https://github.com/GoogleContainerTools/jib/blob/master/docs/faq.md#i-want-to-containerize-a-jar"
   [project]
-  (apply (:build-fn project) [project]))
+  (->> project
+       (merge (config/get :key :default))
+       ((:build-fn project))))
 
 (defn- publish
   "Publishes the image from the project to the repository specified."
