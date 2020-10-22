@@ -1,6 +1,6 @@
-(ns klo.leiningen
+(ns klo.leiningen.core
   (:require [klo.util :refer [symbol->str]]
-            [klo.uberjar :as uberjar]
+            [klo.leiningen.uberjar :as uberjar]
             [clojure.java.shell :as shell]
             [clojure.string :as str]
             [clojure.tools.logging :as log])
@@ -49,7 +49,8 @@
         project-model (binding [*read-eval* false]
                         (read-string project-clj))
         [project-name project-version] (take 2 (drop 1 project-model))]
-    {:build build
-     :publish uberjar/containerize!
+    ;;TODO: config from :profiles {:klo}
+    {:build-fn build
+     :publish-fn uberjar/containerize!
      :name (symbol->str project-name)
      :tag project-version}))

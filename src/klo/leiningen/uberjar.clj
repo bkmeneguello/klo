@@ -1,4 +1,4 @@
-(ns klo.uberjar
+(ns klo.leiningen.uberjar
   (:require [klo.util :refer [as-path]]
             [clojure.tools.logging :as log])
   (:import (com.google.cloud.tools.jib.api Containerizer ImageReference Jib RegistryImage)

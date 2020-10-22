@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [get load])
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
-            [klo.util :refer [as-path]])
+            [klo.util :refer [as-path deep-merge]])
   (:import (java.nio.file Path Files)
            (java.nio.file.attribute FileAttribute)))
 
@@ -36,9 +36,9 @@
 (defn load
   "Loads the configuration from a path relative to current process .klo.edn file"
   []
-  (merge defaults
-         (load-klo-edn (home) :filename "config.edn")
-         (load-klo-edn (as-path ""))))
+  (deep-merge defaults
+              (load-klo-edn (home) :filename "config.edn")
+              (load-klo-edn (as-path ""))))
 
 (defmacro with
   "Wraps the body with a loaded configuration"
@@ -50,4 +50,4 @@
   "Gets an entry from currently bound configuration"
   [& {:keys [key path]}]
   (cond-> (clojure.core/get *config* key)
-    path (merge (load-klo-edn path))))
+    path (deep-merge (load-klo-edn path))))

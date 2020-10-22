@@ -13,3 +13,9 @@
 (defn as-path
   [path & more]
   (Paths/get path (into-array String more)))
+
+(defn deep-merge
+  [a & maps]
+  (if (map? a)
+    (apply merge-with deep-merge a maps)
+    (apply merge-with deep-merge maps)))

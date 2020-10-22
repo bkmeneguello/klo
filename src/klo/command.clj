@@ -1,7 +1,8 @@
 (ns klo.command
   (:refer-clojure :exclude [resolve])
   (:require [klo.config :as config]
-            [klo.publish :as publish])
+            [klo.publish :as publish]
+            [klo.resolve :as resolve])
   (:import (com.google.cloud.tools.jib.api ImageReference)))
 
 (defn- print-image
@@ -17,4 +18,9 @@
        publish/execute
        print-image)))
 
-(defn resolve [])
+(defn resolve
+  [opts]
+  (config/with
+   (-> opts
+       resolve/execute
+       println)))

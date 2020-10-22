@@ -1,6 +1,6 @@
 (ns klo.publish
   (:require [klo.config :as config]
-            [klo.leiningen :as lein]
+            [klo.leiningen.core :as lein]
             [klo.util :refer [str->symbol as-path]]
             [clojure.java.shell :as shell]
             [clojure.tools.logging :as log]
@@ -104,14 +104,14 @@
   "The project is built to produce a runnable standalone JAR file.
    @see https://github.com/GoogleContainerTools/jib/blob/master/docs/faq.md#i-want-to-containerize-a-jar"
   [project]
-  (apply (:build project) [project]))
+  (apply (:build-fn project) [project]))
 
 (defn- publish
   "Publishes the image from the project to the repository specified."
   [{:keys [repo name tag] :as project}]
   ;; TODO: naming strategies https://github.com/google/ko/blob/3c6a907da983cda3f0c85f56ca41de16f8e20960/pkg/commands/options/publish.go#L80
   (let [image (ImageReference/of repo name tag)
-        published (apply (:publish project) [project image])]
+        published (apply (:publish-fn project) [project image])]
     (assoc project :image published)))
 
 (defn- cleanup
