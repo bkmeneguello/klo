@@ -1,5 +1,5 @@
 (ns klo.leiningen.core
-  (:require [klo.util :refer [symbol->str]]
+  (:require [klo.util :refer [symbol->str deep-merge]]
             [klo.leiningen.uberjar :as uberjar]
             [clojure.java.shell :as shell]
             [clojure.string :as str]
@@ -49,8 +49,10 @@
         project-model (binding [*read-eval* false]
                         (read-string project-clj))
         [project-name project-version] (take 2 (drop 1 project-model))]
-    ;;TODO: config from :profiles {:klo}
-    {:build-fn build
-     :publish-fn uberjar/containerize!
-     :name (symbol->str project-name)
-     :tag project-version}))
+    (deep-merge {:build-fn build
+                 :publish-fn uberjar/containerize!
+                 :name (symbol->str project-name)
+                 :tag project-version}
+                (-> (->> (drop 3 project-model)
+                         (apply hash-map))
+                    (get-in [:profiles :klo] {})))))
