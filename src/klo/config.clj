@@ -6,12 +6,12 @@
   (:import (java.nio.file Path Files)
            (java.nio.file.attribute FileAttribute)))
 
-(def ^{:dynamic true :private true} *config* nil)
-
-(def ^:private defaults
-  {:default {:base "adoptopenjdk/openjdk8"}})
+(def ^{:dynamic true :private true} *config* 
+  "The current configuration of the process"
+  nil)
 
 (defn- load-klo-edn
+  "Loads the config from the path specified with an optional custom name."
   [^Path path & {:keys [^String filename]
                  :or {filename ".klo.edn"}}]
   (try
@@ -33,6 +33,9 @@
     (cond-> klo-home
       (not (Files/isReadable klo-home)) (Files/createDirectory (into-array FileAttribute [])))))
 
+(def ^:private defaults
+  {:default {:base "adoptopenjdk/openjdk8"}})
+
 (defn load
   "Loads the configuration from a path relative to current process .klo.edn file"
   []
@@ -47,7 +50,7 @@
      ~@body))
 
 (defn get
-  "Gets an entry from currently bound configuration"
-  [& {:keys [key path]}]
+  "Gets an entry from currently bound configuration merged with the config of optional path"
+  [key & {:keys [path]}]
   (cond-> (clojure.core/get *config* key)
     path (deep-merge (load-klo-edn path))))

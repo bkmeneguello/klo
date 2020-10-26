@@ -5,17 +5,11 @@
             [clojure.string :as str]
             [clojure.tools.logging :as log])
   (:import (java.nio.file Path Files)
-           (java.io BufferedReader StringReader IOException)))
+           (java.io BufferedReader StringReader IOException)
+           (java.util Map)))
 
-(defn- project-clj
-  [^Path path]
-  (.resolve path "project.clj"))
-
-(defn project?
-  [^Path path]
-  (Files/isReadable (project-clj path)))
-
-(defn- leiningen
+(defn- ^String leiningen
+  "Finds the leiningen command in the system path"
   []
   (some #(try (-> (shell/sh % "lein")
                   :out
@@ -24,6 +18,7 @@
         ["which" "where"]))
 
 (defn- uberjar!
+  "Invokes the leiningen uberjar target"
   [^Path path]
   (let [current-env (into {} (System/getenv))]
     (log/infof "Building %s" path)
@@ -38,12 +33,23 @@
          first
          (#(str/replace % "Created " "")))))
 
-(defn- build
-  [project]
+(defn- ^Map build
+  "Build the project uberjar"
+  [^Map project]
   (let [uberjar (uberjar! (:path project))]
     (assoc project :uberjar uberjar)))
 
-(defn parse
+(defn- ^Path project-clj
+  [^Path path]
+  (.resolve path "project.clj"))
+
+(defn ^boolean project?
+  "Checks if the project is a Leinigen project"
+  [^Path path]
+  (Files/isReadable (project-clj path)))
+
+(defn ^Map parse
+  "Parses the path as a Leiningen project, gathering some information from the project.clj"
   [^Path path]
   (let [project-clj (slurp (.toUri (project-clj path)))
         project-model (binding [*read-eval* false]

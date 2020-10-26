@@ -8,26 +8,31 @@
   (:import (com.google.cloud.tools.jib.api ImageReference)
            (org.apache.commons.validator.routines UrlValidator)
            (org.apache.commons.io FilenameUtils FileUtils)
+           (java.net URI)
            (java.nio.file Path Files)
            (java.nio.file.attribute FileAttribute)))
 
 (defn- parse-uri
+  "Checks if the string is a URI of one of the valid schemas"
   [^String s]
   (let [validator (UrlValidator. (into-array ["http", "https", "ssh", "git"]))]
     (when (.isValid validator s)
-      (java.net.URI. s))))
+      (URI. s))))
 
 (defn- parse-git-ssh-uri
+  "Parse the string as a SCP-like URL then returns as an SSH URI.
+   https://git-scm.com/book/en/v2/Git-on-the-Server-The-Protocols#_the_ssh_protocol"
   [^String s]
   (when-let [[_ authority path] (re-matches #"(git@[-\w.]+):(.+\.git)\/?$" s)]
-    (java.net.URI. (str "ssh://" authority "/" path))))
+    (URI. (str "ssh://" authority "/" path))))
 
 (defn- parse-github-repo
+  "Parses the string to check if it's a Github repository the returns as URI."
   ;; TODO: Check from config if HTTPS or SSH is prefered
   ;; TODO: Consider Github Enterprise?
   [^String path]
   (when (str/starts-with? path "github.com/")
-    (java.net.URI. (str "https://" path (when-not (str/ends-with? path ".git") ".git")))))
+    (URI. (str "https://" path (when-not (str/ends-with? path ".git") ".git")))))
 
 (defn- create
   "Creates a new project data with default values.
@@ -48,21 +53,23 @@
 (def ^:private known-archives
   ["zip" "bz2" "gz" "tar" "tgz" "tbz" "txz"])
 
-(defn- downloadable-artifact?
-  [^java.net.URI uri]
+(defn- ^boolean downloadable-artifact?
+  "Checks if the URI is pointing to a know archive file"
+  [^URI uri]
   (let [path (.getPath uri)]
     (FilenameUtils/isExtension path (into-array known-archives))))
 
-(defn- download-artifact
+(defn- ^Path download-artifact
+  "Downloads and, optionally, decompress and extracts the artifact."
   ;; TODO: Implement this
-  [^java.net.URI uri]
-  (throw (ex-info "Download is not supported yet." {:uri uri}))
-  (comment "Return a java.nio.file.Path"))
+  [^URI uri]
+  (throw (ex-info "Download is not supported yet." {:uri uri})))
 
-(defn- clone-repository
-  [^java.net.URI uri]
+(defn- ^Path clone-repository
+  "Clones a Git repository to a temporary local path then return this path"
+  [^URI uri]
   (let [uri-str (str uri)
-        path (str (Files/createTempDirectory "klo-" (into-array FileAttribute []))) ;; FIXME: Customize target directory
+        path (str (Files/createTempDirectory "klo-" (into-array FileAttribute []))) ;;FIXME: Customize target directory
         _ (log/infof "cloning %s into %s" uri-str path)
         shellout (shell/sh "git" "clone" uri-str path)]
     (when-not (zero? (:exit shellout))
@@ -75,7 +82,7 @@
    If the URL is a Git remote, the project is cloned.
    If the URL is a known compressed file, it's downloaded and extracted to a 
    temporary location."
-  [{:keys [^java.net.URI uri ^Path path] :as project}]
+  [{:keys [^URI uri ^Path path] :as project}]
   (cond (and uri (not path))
         (merge project
                {:path (cond
@@ -96,7 +103,7 @@
   (let [project (cond
                   (lein/project? path) (merge (lein/parse path) project)
                   :else (throw (ex-info "The path is not a know project" project)))
-        project-config (config/get :key (str->symbol (:name project)) :path path)]
+        project-config (config/get (str->symbol (:name project)) :path path)]
     (cond-> project
       (:exists project-config) (merge project-config))))
 
@@ -105,7 +112,7 @@
    @see https://github.com/GoogleContainerTools/jib/blob/master/docs/faq.md#i-want-to-containerize-a-jar"
   [project]
   (->> project
-       (merge (config/get :key :default))
+       (merge (config/get :default))
        ((:build-fn project))))
 
 (defn- publish
@@ -117,6 +124,7 @@
     (assoc project :image published)))
 
 (defn- cleanup
+  "Check if the path is temporary then removes the directory."
   [{:keys [^Path path ^boolean temp?] :as project}]
   (when temp? ;;TODO: Check if should keep
     (log/infof "Cleaning up the directory %s" path)
