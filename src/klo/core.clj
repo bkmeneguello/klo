@@ -24,7 +24,7 @@
    :version     "0.0.1"
    :opts        [{:as      "Log verbosity, the higher the number more information is printed"
                   :default 3
-                  :option  "vebosity"
+                  :option  "verbosity"
                   :short   "v"
                   :type    :int}
                  {:as      "Suppress any progress output. Best suited for scripts"
@@ -63,7 +63,7 @@
   [args]
   (let [commandline (:commandline (cli/parse-command-line args CONFIGURATION))
         quiet (:quiet commandline)
-        verbosity (:vebosity commandline)
+        verbosity (:verbosity commandline)
         level (cond
                 (or quiet (= verbosity 0)) (Level/OFF)
                 (= verbosity 1) (Level/ERROR)
