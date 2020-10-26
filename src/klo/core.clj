@@ -21,7 +21,7 @@
 (def ^:private CONFIGURATION
   {:command     "klo"
    :description "A tool to build and deploy Clojure applications to Kubernetes"
-   :version     "0.0.1"
+   :version     "0.1.0"
    :opts        [{:as      "Log verbosity, the higher the number more information is printed"
                   :default 3
                   :option  "verbosity"
