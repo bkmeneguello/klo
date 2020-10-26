@@ -1,8 +1,8 @@
-(ns klo.command
+(ns klo.command.core
   (:refer-clojure :exclude [resolve])
   (:require [klo.config :as config]
-            [klo.publish :as publish]
-            [klo.resolve :as resolve])
+            [klo.command.publish :as publish]
+            [klo.command.resolve :as resolve])
   (:import (com.google.cloud.tools.jib.api ImageReference)))
 
 (defn- print-image
@@ -14,13 +14,13 @@
    It prints the image digest after it is published."
   [opts]
   (config/with-config
-   (-> opts
-       publish/execute
-       print-image)))
+    (-> opts
+        publish/execute
+        print-image)))
 
 (defn resolve
   [opts]
   (config/with-config
-   (-> opts
-       resolve/execute
-       println)))
+    (-> opts
+        resolve/execute
+        println)))

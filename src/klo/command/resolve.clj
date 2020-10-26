@@ -1,11 +1,11 @@
-(ns klo.resolve
+(ns klo.command.resolve
   (:refer-clojure :exclude [resolve])
   (:require [clojure.java.io :as io]
             [clojure.core :as clj]
             [clj-yaml.core]
             [clojure.string :as str]
             [clojure.walk :as walk]
-            [klo.publish :as publish])
+            [klo.command.publish :as publish])
   (:import (java.io SequenceInputStream)
            (org.apache.commons.io FilenameUtils)))
 

@@ -1,4 +1,4 @@
-(ns klo.publish
+(ns klo.command.publish
   (:require [klo.config :as config]
             [klo.leiningen.core :as lein]
             [klo.util :refer [str->symbol as-path]]

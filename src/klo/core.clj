@@ -1,7 +1,7 @@
 (ns klo.core
   (:gen-class)
   (:require [cli-matic.core :as cli]
-            [klo.command :as cmd])
+            [klo.command.core :as cmd])
   (:import (ch.qos.logback.classic Level)
            (org.slf4j LoggerFactory)))
 
