@@ -6,7 +6,7 @@
   (:import (java.nio.file Path Files)
            (java.nio.file.attribute FileAttribute)))
 
-(def ^{:dynamic true :private true} *config* 
+(def ^{:dynamic true :private true} *config*
   "The current configuration of the process"
   nil)
 

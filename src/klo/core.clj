@@ -58,7 +58,7 @@
                             repo-option]
                      :runs        cmd/resolve}]})
 
-(defn- setup-logging!
+(defn- setup-logging
   "Check command line arguments for verbosity value and setup ROOT logger"
   [args]
   (let [commandline (:commandline (cli/parse-command-line args CONFIGURATION))
@@ -78,5 +78,5 @@
 
 (defn -main
   [& args]
-  (setup-logging! args)
+  (setup-logging args)
   (cli/run-cmd args CONFIGURATION))

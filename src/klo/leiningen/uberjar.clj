@@ -27,7 +27,7 @@
   (-> (CredentialRetrieverFactory/forImage image (->log-event-consumer))
       .dockerConfig))
 
-(defn containerize!
+(defn containerize
   [{:keys [name base uberjar]} ^ImageReference image]
   (log/infof "Using base %s for %s" base name)
   (log/infof "Building and publishing %s" (.toStringWithQualifier image))

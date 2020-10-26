@@ -111,9 +111,9 @@
   "The project is built to produce a runnable standalone JAR file.
    @see https://github.com/GoogleContainerTools/jib/blob/master/docs/faq.md#i-want-to-containerize-a-jar"
   [project]
-  (->> project
-       (merge (config/get :default))
-       ((:build-fn project))))
+  (let [project (merge (config/get :default) project)
+        build-fn (:build-fn project)]
+    (build-fn project)))
 
 (defn- publish
   "Publishes the image from the project to the repository specified."
