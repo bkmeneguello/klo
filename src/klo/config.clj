@@ -43,7 +43,7 @@
               (load-klo-edn (home) :filename "config.edn")
               (load-klo-edn (as-path ""))))
 
-(defmacro with
+(defmacro with-config
   "Wraps the body with a loaded configuration"
   [& body]
   `(binding [*config* (load)]
