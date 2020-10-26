@@ -16,7 +16,7 @@
    :option "repo"
    :type :string
    :short "R"
-   :env "CLO_DOCKER_REPO"})
+   :env "KLO_DOCKER_REPO"})
 
 (def ^:private CONFIGURATION
   {:command     "klo"
