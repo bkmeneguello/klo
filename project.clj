@@ -7,7 +7,7 @@
                  [cli-matic "0.4.3"]
                  [commons-validator "1.7"]
                  [commons-io "2.8.0"]
-                 [com.google.cloud.tools/jib-core "0.15.0"]
+                 [com.google.cloud.tools/jib-core "0.16.0"]
                  [org.clojure/tools.logging "1.1.0"]
                  [ch.qos.logback/logback-classic "1.2.3"]
                  [clj-commons/clj-yaml "0.7.0"]]
