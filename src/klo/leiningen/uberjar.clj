@@ -2,7 +2,7 @@
   (:require [klo.fs :as fs]
             [klo.util :refer [->image]]
             [clojure.tools.logging :as log])
-  (:import (com.google.cloud.tools.jib.api Containerizer ImageReference Jib RegistryImage)
+  (:import (com.google.cloud.tools.jib.api Containerizer ImageReference Jib RegistryImage DockerDaemonImage)
            (com.google.cloud.tools.jib.api.buildplan AbsoluteUnixPath FileEntriesLayer)
            (com.google.cloud.tools.jib.event.events ProgressEvent)
            (com.google.cloud.tools.jib.frontend CredentialRetrieverFactory)))
@@ -28,21 +28,26 @@
   (-> (CredentialRetrieverFactory/forImage image (->log-event-consumer))
       .dockerConfig))
 
+(defn- ->registry
+  [registry ^ImageReference image]
+  (condp = registry
+    :registry (-> (RegistryImage/named image)
+                  (.addCredentialRetriever (->credential-retriever image)))
+    :docker-daemon (DockerDaemonImage/named image)))
+
 (defn containerize
-  [{:keys [name base uberjar]} ^ImageReference image]
+  [{:keys [name base ^ImageReference target uberjar registry]}]
   (log/infof "Using base %s for %s" base name)
-  (log/infof "Building and publishing %s" (.toStringWithQualifier image))
+  (log/infof "Building and publishing %s" (.toStringWithQualifier target))
   (let [entrypoint-jar "/opt/app.jar" ;;TODO: Make configurable
         container (-> (Jib/from base)
                       (.addFileEntriesLayer (-> (FileEntriesLayer/builder)
-                                                (.setName "uberjar") ;;TODO: Make configurable
+                                                (.setName name)
                                                 (.addEntry (fs/as-path uberjar) (str->unix-path entrypoint-jar))
                                                 .build))
                       (.setEntrypoint (into-array ["java" "-jar" entrypoint-jar])) ;;TODO: Make configurable
-                      (.containerize (let [registry (-> (RegistryImage/named image)
-                                                        (.addCredentialRetriever (->credential-retriever image)))]
-                                       (-> (Containerizer/to registry)
-                                           (.addEventHandler ProgressEvent (->progress-event-consumer))))))
+                      (.containerize (-> (Containerizer/to (->registry registry target))
+                                         (.addEventHandler ProgressEvent (->progress-event-consumer)))))
         published-image (->image (format "%s@%s" (.getTargetImage container) (.getDigest container)))]
     (log/infof "Published %s" published-image)
     published-image))

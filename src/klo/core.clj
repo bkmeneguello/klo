@@ -7,7 +7,7 @@
 
 (def ^:private local-option
   {:as "Load into images to local docker daemon."
-   :option "local"
+   :option "local?"
    :type :with-flag
    :short "L"})
 

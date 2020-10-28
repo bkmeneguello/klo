@@ -121,10 +121,11 @@
 (deftest test-publish
   (let [publish #'klo.command.publish/publish]
     (testing "publish"
-      (let [image (->image nil "image" nil)
-            publish-fn (fn [_ _] image)]
-        (is (= {:publish-fn publish-fn :name "test" :image image}
-               (publish {:publish-fn publish-fn :name "test"})))))))
+      (let [target (->image nil "test" nil)
+            image (->image nil "test" nil)
+            publish-fn (fn [_] image)]
+        (is (= {:publish-fn publish-fn :name "test" :target target :image image}
+               (publish {:publish-fn publish-fn :name "test" :target target})))))))
 
 (deftest test-cleanup
   (let [cleanup #'klo.command.publish/cleanup]
