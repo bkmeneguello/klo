@@ -1,5 +1,6 @@
 (ns klo.leiningen.uberjar
-  (:require [klo.util :refer [as-path]]
+  (:require [klo.fs :as fs]
+            [klo.util :refer [->image]]
             [clojure.tools.logging :as log])
   (:import (com.google.cloud.tools.jib.api Containerizer ImageReference Jib RegistryImage)
            (com.google.cloud.tools.jib.api.buildplan AbsoluteUnixPath FileEntriesLayer)
@@ -35,13 +36,13 @@
         container (-> (Jib/from base)
                       (.addFileEntriesLayer (-> (FileEntriesLayer/builder)
                                                 (.setName "uberjar") ;;TODO: Make configurable
-                                                (.addEntry (as-path uberjar) (str->unix-path entrypoint-jar))
+                                                (.addEntry (fs/as-path uberjar) (str->unix-path entrypoint-jar))
                                                 .build))
                       (.setEntrypoint (into-array ["java" "-jar" entrypoint-jar])) ;;TODO: Make configurable
                       (.containerize (let [registry (-> (RegistryImage/named image)
                                                         (.addCredentialRetriever (->credential-retriever image)))]
                                        (-> (Containerizer/to registry)
                                            (.addEventHandler ProgressEvent (->progress-event-consumer))))))
-        published-image (ImageReference/parse (format "%s@%s" (.getTargetImage container) (.getDigest container)))]
+        published-image (->image (format "%s@%s" (.getTargetImage container) (.getDigest container)))]
     (log/infof "Published %s" published-image)
     published-image))

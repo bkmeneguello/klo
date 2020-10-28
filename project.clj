@@ -25,4 +25,6 @@
                         "--no-server"
                         "--no-fallback"]}
   :profiles {:uberjar {:aot :all
-                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}})
+                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}
+             :test {:dependencies [[nubank/mockfn "0.6.1"]]
+                    :plugins [[lein-cloverage "1.1.2"]]}})

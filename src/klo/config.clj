@@ -2,9 +2,9 @@
   (:refer-clojure :exclude [get load])
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
-            [klo.util :refer [as-path deep-merge]])
-  (:import (java.nio.file Path Files)
-           (java.nio.file.attribute FileAttribute)))
+            [klo.util :refer [deep-merge]]
+            [klo.fs :as fs])
+  (:import (java.nio.file Path)))
 
 (def ^{:dynamic true :private true} *config*
   "The current configuration of the process"
@@ -15,7 +15,7 @@
   [^Path path & {:keys [^String filename]
                  :or {filename ".klo.edn"}}]
   (try
-    (-> (.. path (resolve filename) toUri)
+    (-> (.. (fs/as-path path filename) toUri)
         slurp
         edn/read-string
         (assoc :exists true
@@ -24,14 +24,14 @@
     (catch Exception e {:exists true
                         :error e})))
 
-(defn- home
-  "Return full path to the user's Klo home directory."
+(defn- ^Path home
+  "Return the path to the user's Klo home directory."
   []
   (let [klo-home (System/getenv "KLO_HOME")
-        klo-home (or (and klo-home (as-path klo-home))
-                     (as-path (System/getProperty "user.home") ".klo"))]
+        klo-home (or (and klo-home (fs/as-path klo-home))
+                     (fs/as-path (System/getProperty "user.home") ".klo"))]
     (cond-> klo-home
-      (not (Files/isReadable klo-home)) (Files/createDirectory (into-array FileAttribute [])))))
+      (not (fs/exists? klo-home)) fs/create-dir)))
 
 (def ^:private defaults
   {:default {:base "adoptopenjdk/openjdk8"}})
@@ -41,7 +41,7 @@
   []
   (deep-merge defaults
               (load-klo-edn (home) :filename "config.edn")
-              (load-klo-edn (as-path ""))))
+              (load-klo-edn (fs/as-path ""))))
 
 (defmacro with-config
   "Wraps the body with a loaded configuration"

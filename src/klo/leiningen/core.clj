@@ -1,11 +1,12 @@
 (ns klo.leiningen.core
-  (:require [klo.util :refer [symbol->str deep-merge]]
+  (:require [klo.util :refer [as-string deep-merge]]
             [klo.leiningen.uberjar :as uberjar]
+            [klo.fs :as fs]
             [clojure.java.shell :as shell]
             [clojure.java.io :as io]
             [clojure.string :as str]
             [clojure.tools.logging :as log])
-  (:import (java.nio.file Path Files)
+  (:import (java.nio.file Path)
            (java.io IOException)
            (java.util Map)))
 
@@ -38,12 +39,12 @@
 
 (defn- ^Path project-clj
   [^Path path]
-  (.resolve path "project.clj"))
+  (fs/as-path path "project.clj"))
 
 (defn ^boolean project?
   "Checks if the project is a Leinigen project"
   [^Path path]
-  (Files/isReadable (project-clj path)))
+  (fs/exists? (project-clj path)))
 
 (defn ^Map parse
   "Parses the path as a Leiningen project, gathering some information from the project.clj"
@@ -56,6 +57,6 @@
         data (apply hash-map model-data)]
     (deep-merge {:build-fn build
                  :publish-fn uberjar/containerize
-                 :name (symbol->str project-name)
+                 :name (as-string project-name)
                  :tag project-version}
                 (get-in data [:profiles :klo] {}))))
