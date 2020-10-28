@@ -2,12 +2,13 @@
   (:refer-clojure :exclude [resolve])
   (:require [klo.config :as config]
             [klo.command.publish :as publish]
-            [klo.command.resolve :as resolve])
+            [klo.command.resolve :as resolve]
+            [klo.util :refer [as-string]])
   (:import (com.google.cloud.tools.jib.api ImageReference)))
 
 (defn- print-image
-  [{:keys [^ImageReference image]}]
-  (println (.toStringWithQualifier image)))
+  [{:keys [^ImageReference target]}]
+  (println (as-string target)))
 
 (defn publish
   "Simply builds and publishes images for the path passed as an argument.

@@ -1,7 +1,7 @@
 (ns klo.command.publish
   (:require [klo.config :as config]
             [klo.leiningen.core :as lein]
-            [klo.util :refer [->image as-symbol]]
+            [klo.util :refer [->image as-symbol sha256]]
             [klo.fs :as fs]
             [clojure.java.shell :as shell]
             [clojure.tools.logging :as log]
@@ -49,7 +49,7 @@
    The `repo`, `name` and `tag` parameters are populated into the initial project.
    The default `base` docker image is defined into the project."
   [{:keys [^String path ^boolean local?] :as opts}]
-  (let [project (cond-> (select-keys opts [:repo :name :tag])
+  (let [project (cond->> (select-keys opts [:repo :name :tag])
                   local? (merge {:repo "klo.local" :registry :docker-daemon}))]
     ;;TODO: validate project attributes from opts
     (when (str/blank? path)
@@ -133,10 +133,11 @@
 
 (defn- publish
   "Publishes the image from the project to the repository specified."
-  [{:keys [repo name tag] :as project}]
+  [{:keys [^Path path ^String repo ^String name ^String tag] :as project}]
   ;; TODO: naming strategies https://github.com/google/ko/blob/3c6a907da983cda3f0c85f56ca41de16f8e20960/pkg/commands/options/publish.go#L80
   (let [publish-fn (:publish-fn project)
-        project (assoc project :target (->image repo name tag))]
+        project (assoc project :target (->image repo name (sha256 (str path))))]
+    ;;TODO: tag?
     (assoc project :image (publish-fn project))))
 
 (defn- delete-path

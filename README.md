@@ -12,6 +12,15 @@ The package is distributed as a standalone executable JAR file. This command is 
 
     java -jar klo-0.1.0-standalone.jar [args]
 
+#### Global Options
+
+| Option | Default | Description |
+| -- | -- | -- |
+| -v\<X\> | -v3 | The verbosity of logging output. The higher the number more verbose messages are shown (range from 0-5)
+| -q | - | Suppress all non essential output, usefull for scripts. Equivalent to `-v0`
+
+## Commands
+
 ### `klo publish [options] <path>`
 
 This command takes a repository path as argument, ensure it's published as a Docker image and returns the image locator.
@@ -21,6 +30,10 @@ This command takes a repository path as argument, ensure it's published as a Doc
 | Option | Default | Description |
 | -- | -- | -- |
 | path | "." | The project path to build. The acceptable paths are described in [Klo URIs](#uris), the `klo` scheme is not allowed here.
+| -R --repo=url | - | Docker base repository URL to wich the images will be pushed [$KLO_DOCKER_REPO]
+| --name=image | - | Docker image name to replace project name
+| --tag=tag | - | Docker image tag to replace project version
+| -L | - | Load into images to [local docker daemon](#minikube).
 
 #### Examples
 
@@ -51,6 +64,23 @@ Remote URIs:
 - `https://github.com/user/repo.git`
 - `ssh://git@github.com:user/repo.git`
 - `https://example.com/archived/repo.zip` (also `http` schema and `bz2`, `gz`, `tar`, `tar.bz2`, `tar.gz`, `tar.xz`, `tgz`, `tbz`, `txz` archive formats)
+
+## <a name="minikube"></a>With [minikube](https://github.com/kubernetes/minikube)
+
+You can publish images with `klo` directly to `minikube` via the local Docker deamon.
+
+An example of the required setup:
+
+    # Use the minikube docker daemon.
+    eval $(minikube -p minikube docker-env)
+    
+    # Make sure minikube is the current kubectl context.
+    kubectl config use-context minikube
+    
+    # Deploy to minikube w/o registry.
+    klo resolve -L -f config/ | kubectl apply -f-
+
+With the `local` flag, `klo` register the image with the `klo.local` repository (can be overwriten with `--repo`) and forces the use of local Docker daemon to push the image to ensure the minikube's `docker-env` is used.
 
 ### Bugs
 

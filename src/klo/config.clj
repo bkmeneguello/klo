@@ -34,8 +34,7 @@
       (not (fs/exists? klo-home)) fs/create-dir)))
 
 (def ^:private defaults
-  {:default {:base "adoptopenjdk/openjdk8"
-             :registry :registry}})
+  {:default {:base "adoptopenjdk/openjdk8"}})
 
 (defn load
   "Loads the configuration from a path relative to current process .klo.edn file"

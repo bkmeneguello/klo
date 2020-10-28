@@ -5,7 +5,8 @@
             [clj-yaml.core]
             [clojure.string :as str]
             [clojure.walk :as walk]
-            [klo.command.publish :as publish])
+            [klo.command.publish :as publish]
+            [klo.util :refer [as-string]])
   (:import (java.io SequenceInputStream)
            (org.apache.commons.io FilenameUtils)))
 
@@ -14,7 +15,7 @@
    them separated by \"---\" YAML document separator."
   [dir]
   (->> (file-seq dir)
-       (filter #(not (.isDirectory %))) ;;TODO: filter by name
+       (filter #(not (.isDirectory %)))
        (filter #(FilenameUtils/isExtension (.getName %) (into-array ["yaml" "yml"])))
        (map #(partial io/input-stream %))
        (interpose #(io/input-stream (.getBytes "\n---\n")))
@@ -70,7 +71,7 @@
 (defn- ^String publish
   "Delegates to publish command and returns the published image"
   [^String path opts]
-  (.toStringWithQualifier (:image (publish/execute (assoc opts :path path)))))
+  (as-string (:target (publish/execute (assoc opts :path path)))))
 
 (def ^:private publish-cache
   "This is an atomic cache to keep publish job futures indexed by project path"

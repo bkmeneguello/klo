@@ -4,7 +4,7 @@
             [klo.command.publish]
             [klo.config]
             [klo.fs :as fs]
-            [klo.util :refer [->image]]
+            [klo.util :refer [->image sha256]]
             [klo.leiningen.core :as lein]
             [clojure.java.shell :as shell]
             [mockfn.macros :refer [providing verifying]]
@@ -48,7 +48,13 @@
                (create {:path "file:///path/to/repo"}))))
       (testing "with remote project path"
         (is (= {:uri (URI. "https://github.com/user/repo.git")}
-               (create {:path "github.com/user/repo"})))))))
+               (create {:path "github.com/user/repo"}))))
+      (testing "build to local repository"
+        (is (= {:path (fs/as-path "path/to/repo") :repo "klo.local" :registry :docker-daemon}
+               (create {:path "path/to/repo" :local? true})))
+        (testing "should preserve user-defined repository"
+          (is (= {:path (fs/as-path "path/to/repo") :repo "user.repo" :registry :docker-daemon}
+                 (create {:path "path/to/repo" :repo "user.repo" :local? true}))))))))
 
 (deftest test-download
   (let [download #'klo.command.publish/download]
@@ -121,7 +127,7 @@
 (deftest test-publish
   (let [publish #'klo.command.publish/publish]
     (testing "publish"
-      (let [target (->image nil "test" nil)
+      (let [target (->image nil "test" (sha256 ""))
             image (->image nil "test" nil)
             publish-fn (fn [_] image)]
         (is (= {:publish-fn publish-fn :name "test" :target target :image image}

@@ -31,9 +31,9 @@
 (defn- ->registry
   [registry ^ImageReference image]
   (condp = registry
-    :registry (-> (RegistryImage/named image)
-                  (.addCredentialRetriever (->credential-retriever image)))
-    :docker-daemon (DockerDaemonImage/named image)))
+    :docker-daemon (DockerDaemonImage/named image)
+    (-> (RegistryImage/named image)
+        (.addCredentialRetriever (->credential-retriever image)))))
 
 (defn containerize
   [{:keys [name base ^ImageReference target uberjar registry]}]
