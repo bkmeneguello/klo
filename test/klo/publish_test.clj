@@ -3,9 +3,9 @@
   (:require [clojure.test :refer [deftest testing is are]]
             [klo.command.publish]
             [klo.config]
-            [klo.fs :as fs]
             [klo.util :refer [->image sha256]]
             [klo.leiningen.core :as lein]
+            [ike.cljj.file :as fs]
             [clojure.java.shell :as shell]
             [mockfn.macros :refer [providing verifying]]
             [mockfn.matchers :as matcher])
@@ -139,9 +139,9 @@
       (let [path (fs/as-path "/tmp/klo-fake-repo")]
         (testing "a local path"
           (is (= {:path path :temp? false}
-                 (verifying [(fs/delete-dir path) nil (matcher/exactly 0)]
+                 (verifying [(fs/delete path) nil (matcher/exactly 0)]
                             (cleanup {:path path :temp? false})))))
         (testing "a temp path"
           (is (= {}
-                 (verifying [(fs/delete-dir path) nil (matcher/at-least 1)]
+                 (verifying [(fs/delete path) nil (matcher/at-least 1)]
                             (cleanup {:path path :temp? true})))))))))

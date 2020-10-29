@@ -1,7 +1,7 @@
 (ns klo.leiningen.core
   (:require [klo.util :refer [as-string deep-merge]]
             [klo.leiningen.uberjar :as uberjar]
-            [klo.fs :as fs]
+            [ike.cljj.file :as fs]
             [clojure.java.shell :as shell]
             [clojure.java.io :as io]
             [clojure.string :as str]
@@ -39,7 +39,7 @@
 
 (defn- ^Path project-clj
   [^Path path]
-  (fs/as-path path "project.clj"))
+  (.resolve path "project.clj"))
 
 (defn ^boolean project?
   "Checks if the project is a Leinigen project"

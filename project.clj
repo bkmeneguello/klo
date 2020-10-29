@@ -10,7 +10,8 @@
                  [com.google.cloud.tools/jib-core "0.16.0"]
                  [org.clojure/tools.logging "1.1.0"]
                  [ch.qos.logback/logback-classic "1.2.3"]
-                 [clj-commons/clj-yaml "0.7.0"]]
+                 [clj-commons/clj-yaml "0.7.0"]
+                 [org.ajoberstar/ike.cljj "0.4.1"]]
   :main klo.core
   :target-path "target/%s"
   :plugins [[lein-cljfmt "0.7.0"]

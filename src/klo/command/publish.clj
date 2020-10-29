@@ -2,7 +2,7 @@
   (:require [klo.config :as config]
             [klo.leiningen.core :as lein]
             [klo.util :refer [->image as-symbol sha256]]
-            [klo.fs :as fs]
+            [ike.cljj.file :as fs]
             [clojure.java.shell :as shell]
             [clojure.tools.logging :as log]
             [clojure.string :as str])
@@ -56,7 +56,7 @@
       (throw (ex-info "Empty paths are invalid" {:path path})))
     (merge project
            (if-let [uri (as-uri path)]
-             (if (fs/path? uri)
+             (if (= "file" (.getScheme uri))
                {:path (fs/as-path uri)}
                {:uri uri})
              {:path (fs/as-path path)}))))
@@ -143,7 +143,7 @@
 (defn- delete-path
   [{:keys [^Path path] :as project}]
   (log/infof "Cleaning up the directory %s" path)
-  (fs/delete-dir path)
+  (fs/delete path)
   (dissoc project :path :temp?))
 
 (defn- cleanup

@@ -1,9 +1,9 @@
 (ns klo.config
   (:refer-clojure :exclude [get load])
-  (:require [clojure.edn :as edn]
-            [clojure.java.io :as io]
-            [klo.util :refer [deep-merge]]
-            [klo.fs :as fs])
+  (:require [klo.util :refer [deep-merge]]
+            [ike.cljj.file :as fs]
+            [clojure.edn :as edn]
+            [clojure.java.io :as io])
   (:import (java.nio.file Path)))
 
 (def ^{:dynamic true :private true} *config*
@@ -15,7 +15,7 @@
   [^Path path & {:keys [^String filename]
                  :or {filename ".klo.edn"}}]
   (try
-    (-> (.. (fs/as-path path filename) toUri)
+    (-> (.. path (resolve filename) toUri)
         slurp
         edn/read-string
         (assoc :exists true
@@ -29,9 +29,9 @@
   []
   (let [klo-home (System/getenv "KLO_HOME")
         klo-home (or (and klo-home (fs/as-path klo-home))
-                     (fs/as-path (System/getProperty "user.home") ".klo"))]
+                     (.resolve (fs/as-path (System/getProperty "user.home")) ".klo"))]
     (cond-> klo-home
-      (not (fs/exists? klo-home)) fs/create-dir)))
+      (not (fs/exists? klo-home)) fs/make-dirs)))
 
 (def ^:private defaults
   {:default {:base "adoptopenjdk/openjdk8"}})
