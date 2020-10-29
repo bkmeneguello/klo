@@ -24,13 +24,11 @@
   (when-let [[_ authority path] (re-matches #"(git@[-\w.]+):(.+\.git)\/?$" s)]
     (URI. (str "ssh://" authority "/" path))))
 
-(defn- ^URI parse-github-repo
-  "Parses the string to check if it's a Github repository the returns as URI."
+(defn- ^URI parse-host-uri
+  "Parses the string to check if it's a HTTP repository then returns as URI."
   ;; TODO: Check from config if HTTPS or SSH is prefered
-  ;; TODO: Consider Github Enterprise?
   [^String path]
-  (when (str/starts-with? path "github.com/")
-    (URI. (str "https://" path (when-not (str/ends-with? path ".git") ".git")))))
+  (parse-uri (str "https://" path (when-not (str/ends-with? path ".git") ".git"))))
 
 (defn- ^URI as-uri
   "Returns the path as a URI if it's a valid one."
@@ -39,7 +37,7 @@
     (some #(apply % [path])
           [parse-uri
            parse-git-ssh-uri
-           parse-github-repo])))
+           parse-host-uri])))
 
 (defn- create
   "Creates a new project data with default values.
