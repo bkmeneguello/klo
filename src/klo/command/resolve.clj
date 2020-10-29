@@ -62,11 +62,11 @@
     (clj-yaml.core/encode @data)))
 
 (defn- ^String repo-path
-  "Check if the string is a klo URL then return its URN"
+  "Check if the string is a klo URL then return its URN.
+   Replaces klo:// or klo+scheme:// prefixes"
   [^String s]
-  (let [re #"^klo://"]
-    (when (re-find re s)
-      (str/replace-first s re ""))))
+  (let [re #"^klo(\+(?<scheme>[a-z][a-z0-9+\-.]*://)|://)"]
+    (when (re-find re s) (str/replace-first s re "${scheme}"))))
 
 (defn- ^String publish
   "Delegates to publish command and returns the published image"
