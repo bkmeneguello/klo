@@ -129,7 +129,7 @@
     (testing "publish"
       (let [target (->image nil "test" (sha256 ""))
             image (->image nil "test" nil)
-            publish-fn (fn [_] image)]
+            publish-fn (constantly image)]
         (is (= {:publish-fn publish-fn :name "test" :target target :image image}
                (publish {:publish-fn publish-fn :name "test" :target target})))))))
 

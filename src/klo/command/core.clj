@@ -11,7 +11,7 @@
   (println (as-string target)))
 
 (defn publish
-  "Simply builds and publishes images for the path passed as an argument.
+  "Builds and publishes images for the path passed as an argument.
    It prints the image digest after it is published."
   [opts]
   (config/with-config
