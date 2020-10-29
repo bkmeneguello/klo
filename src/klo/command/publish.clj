@@ -109,15 +109,15 @@
    the `name` and `tag` (if not already defined).
    Also, the project specific configurations defined in `.klo.edn` are 
    overwriten using the current project name as key."
-  [{:keys [^Path path] :as project}]
+  [{:keys [^String name ^Path path] :as project}]
   (when-not (fs/exists? path)
     (throw (ex-info "The local path is not acessible or does not exists" project)))
-  (let [project (cond
-                  (lein/project? path) (merge (lein/parse path) project)
-                  :else (throw (ex-info "The path is not a know project" project)))
-        project-config (config/get (as-symbol (:name project)) :path path)]
-    (cond-> project
-      (:exists project-config) (merge project-config))))
+  (let [project-config (config/get (as-symbol name) :path path)
+        project (cond-> project
+                  (:exists project-config) (merge project-config))]
+    (cond
+      (lein/project? project) (merge (lein/parse path) project)
+      :else (throw (ex-info "The path is not a know project" {:project project})))))
 
 (defn- build
   "The project is built to produce a runnable standalone JAR file.

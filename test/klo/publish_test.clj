@@ -4,7 +4,7 @@
             [klo.command.publish]
             [klo.config]
             [klo.util :refer [->image sha256]]
-            [klo.leiningen.core :as lein]
+            [klo.leiningen :as lein]
             [ike.cljj.file :as fs]
             [clojure.java.shell :as shell]
             [mockfn.macros :refer [providing verifying]]
@@ -99,13 +99,13 @@
         (is (thrown-with-msg? Exception #"The path is not a know project"
                               (let [path (fs/as-path "/tmp/klo-fake-repo")]
                                 (providing [(fs/exists? path) true
-                                            (lein/project? path) false]
+                                            (lein/project? (matcher/any)) false]
                                            (configure {:path path}))))))
       (testing "a simple Leiningen project"
         (let [path (fs/as-path "/tmp/klo-fake-repo")]
           (is (= {:path path}
                  (providing [(fs/exists? path) true
-                             (lein/project? path) true
+                             (lein/project? (matcher/any)) true
                              (lein/parse path) {}]
                             (configure {:path path})))))
         (testing "with project config"
@@ -113,7 +113,7 @@
             (is (= {:path path :exists true} ;;FIXME: "exists" is meaningless here
                    (providing [(fs/exists? path) true
                                (#'klo.config/load-klo-edn path) {:exists true}
-                               (lein/project? path) true
+                               (lein/project? (matcher/any)) true
                                (lein/parse path) {}]
                               (configure {:path path}))))))))))
 

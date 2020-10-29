@@ -6,7 +6,8 @@
             [clojure.java.io :as io]
             [clojure.string :as str]
             [clojure.tools.logging :as log])
-  (:import (java.nio.file Path)
+  (:import (clojure.lang Keyword)
+           (java.nio.file Path)
            (java.io IOException)
            (java.util Map)))
 
@@ -43,8 +44,10 @@
 
 (defn ^boolean project?
   "Checks if the project is a Leinigen project"
-  [^Path path]
-  (fs/exists? (project-clj path)))
+  [{:keys [^Path path ^Keyword builder]}]
+  (if (some? builder)
+    (= :leiningen builder)
+    (fs/exists? (project-clj path))))
 
 (defn ^Map parse
   "Parses the path as a Leiningen project, gathering some information from the project.clj"
@@ -55,7 +58,8 @@
         [model-head model-data] (split-at 3 project-model)
         [project-name project-version] (drop 1 model-head)
         data (apply hash-map model-data)]
-    (deep-merge {:build-fn build
+    (deep-merge {:builder :leiningen
+                 :build-fn build
                  :publish-fn uberjar/containerize
                  :name (as-string project-name)
                  :tag project-version}
