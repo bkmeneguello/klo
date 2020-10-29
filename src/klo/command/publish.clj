@@ -1,6 +1,6 @@
 (ns klo.command.publish
   (:require [klo.config :as config]
-            [klo.leiningen.core :as lein]
+            [klo.leiningen :as lein]
             [klo.util :refer [->image as-symbol sha256]]
             [ike.cljj.file :as fs]
             [clojure.java.shell :as shell]

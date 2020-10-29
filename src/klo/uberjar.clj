@@ -1,4 +1,4 @@
-(ns klo.leiningen.uberjar
+(ns klo.uberjar
   (:require [klo.util :refer [->image]]
             [ike.cljj.file :as fs]
             [clojure.tools.logging :as log])

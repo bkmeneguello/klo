@@ -1,6 +1,6 @@
-(ns klo.leiningen.core
+(ns klo.leiningen
   (:require [klo.util :refer [as-string deep-merge]]
-            [klo.leiningen.uberjar :as uberjar]
+            [klo.uberjar :as uberjar]
             [ike.cljj.file :as fs]
             [clojure.java.shell :as shell]
             [clojure.java.io :as io]
