@@ -8,9 +8,7 @@
             [clojure.string :as str])
   (:import (org.apache.commons.validator.routines UrlValidator)
            (java.net URI)
-           (java.nio.file Path Files)
-           (java.nio.file.attribute FileAttribute)
-           (org.apache.commons.io FilenameUtils)))
+           (java.nio.file Path)))
 
 (defn- ^URI parse-uri
   "Checks if the string is a URI of one of the valid schemas"
@@ -62,13 +60,13 @@
              {:path (fs/as-path path)}))))
 
 (def ^:private known-archives
-  ["zip" "bz2" "gz" "tar" "tgz" "tbz" "txz"])
+  #{"zip" "bz2" "gz" "tar" "tgz" "tbz" "txz"})
 
 (defn- ^boolean downloadable-artifact?
   "Checks if the URI is pointing to a know archive file"
   [^URI uri]
   (let [path (.getPath uri)]
-    (FilenameUtils/isExtension path (into-array known-archives))))
+    (contains? known-archives (fs/extension path))))
 
 (defn- ^Path download-artifact
   "Downloads and, optionally, decompress and extracts the artifact."
@@ -76,16 +74,16 @@
   [^URI uri]
   (throw (ex-info "Download is not supported yet" {:uri uri})))
 
-(defn- ^Path create-temp-dir-path
+(defn- ^Path temp-dir
   []
   ;;FIXME: Customize target directory
-  (Files/createTempDirectory "klo-" (into-array FileAttribute [])))
+  (fs/temp-dir "klo-"))
 
 (defn- ^Path clone-repository
   "Clones a Git repository to a temporary local path then return this path"
   [^URI uri]
   (let [uri-str (str uri)
-        path (str (create-temp-dir-path))
+        path (str (temp-dir))
         _ (log/infof "cloning %s into %s" uri-str path)
         shellout (shell/sh "git" "clone" uri-str path)]
     (when-not (zero? (:exit shellout))

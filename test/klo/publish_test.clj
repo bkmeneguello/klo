@@ -73,7 +73,7 @@
                   :path path
                   :temp? true}
                  (providing [(shell/sh "git" "clone" "https://github.com/user/repo.git" (matcher/a String)) {:exit 0}
-                             (#'klo.command.publish/create-temp-dir-path) (fs/as-path "/tmp/klo-fake-repo")]
+                             (#'klo.command.publish/temp-dir) (fs/as-path "/tmp/klo-fake-repo")]
                             (download {:uri uri}))))
           (is (thrown-with-msg? Exception #"Failed to clone"
                                 (providing [(shell/sh "git" "clone" "https://github.com/user/repo.git" (matcher/a String)) {:exit 1}]

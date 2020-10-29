@@ -1,22 +1,22 @@
 (ns klo.command.resolve
   (:refer-clojure :exclude [resolve])
-  (:require [clojure.java.io :as io]
+  (:require [klo.command.publish :as publish]
+            [klo.util :refer [as-string]]
+            [clojure.java.io :as io]
             [clojure.core :as clj]
             [clj-yaml.core]
+            [ike.cljj.file :as fs]
             [clojure.string :as str]
-            [clojure.walk :as walk]
-            [klo.command.publish :as publish]
-            [klo.util :refer [as-string]])
-  (:import (java.io SequenceInputStream)
-           (org.apache.commons.io FilenameUtils)))
+            [clojure.walk :as walk])
+  (:import (java.io SequenceInputStream)))
 
 (defn- dir-input-stream
   "Recursively converts all YAML files from \"dir\" to inputStream then concat
    them separated by \"---\" YAML document separator."
   [dir]
   (->> (file-seq dir)
-       (filter #(not (.isDirectory %)))
-       (filter #(FilenameUtils/isExtension (.getName %) (into-array ["yaml" "yml"])))
+       (filter fs/file?)
+       (filter #(contains? #{"yaml" "yml"} (fs/extension %)))
        (map #(partial io/input-stream %))
        (interpose #(io/input-stream (.getBytes "\n---\n")))
        (map #(apply % []))
