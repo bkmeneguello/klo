@@ -44,9 +44,9 @@
    The `path` is checked as valid URL or assumed to be a local path.
    The `repo`, `name` and `tag` parameters are populated into the initial project.
    The default `base` docker image is defined into the project."
-  [{:keys [^String path ^boolean local?] :as opts}]
+  [{:keys [^String path ^boolean local] :as opts}]
   (let [project (cond->> (select-keys opts [:repo :name :tag])
-                  local? (merge {:repo "klo.local" :registry :docker-daemon}))]
+                  local (merge {:repo "klo.local" :registry :docker-daemon}))]
     ;;TODO: validate project attributes from opts
     (when (str/blank? path)
       (throw (ex-info "Empty paths are invalid" {:path path})))

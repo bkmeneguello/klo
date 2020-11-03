@@ -51,10 +51,10 @@
                (create {:path "github.com/user/repo"}))))
       (testing "build to local repository"
         (is (= {:path (fs/as-path "path/to/repo") :repo "klo.local" :registry :docker-daemon}
-               (create {:path "path/to/repo" :local? true})))
+               (create {:path "path/to/repo" :local true})))
         (testing "should preserve user-defined repository"
           (is (= {:path (fs/as-path "path/to/repo") :repo "user.repo" :registry :docker-daemon}
-                 (create {:path "path/to/repo" :repo "user.repo" :local? true}))))))))
+                 (create {:path "path/to/repo" :repo "user.repo" :local true}))))))))
 
 (deftest test-download
   (let [download #'klo.command.publish/download]

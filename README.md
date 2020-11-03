@@ -25,7 +25,7 @@ The package is distributed as a standalone executable JAR file. This command is 
 
 This command takes a repository path as argument, [builds it](#project-building) and ensure it's published as a Docker image and returns the image locator.
 
-#### Options
+#### Publish Options
 
 | Option | Default | Description |
 | -- | -- | -- |
@@ -33,9 +33,9 @@ This command takes a repository path as argument, [builds it](#project-building)
 | `-R --repo=url` | - | Docker base repository URL to wich the images will be pushed [$KLO_DOCKER_REPO]
 | `--name=image` | - | Docker image name to replace project name
 | `--tag=tag` | - | Docker image tag to replace project version
-| `-L` | - | Load into images to [local docker daemon](#with-minikube).
+| `-L --local` | - | Load into images to [local docker daemon](#with-minikube).
 
-#### Examples
+#### Publish Examples
 
     klo publish
 
@@ -43,7 +43,45 @@ This command takes a repository path as argument, [builds it](#project-building)
 
     klo publish github.com/user/repo
 
-...
+    klo publish --repo quay.io --name example --tag development github.com/user/repo
+
+    klo publish --local github.com/user/repo
+
+### `klo resolve [options]`
+
+Takes a [YAML stream](#yaml-input) as input, resolve [Klo URIs](#klo-uris) and return the YAML stream.
+
+#### Resolve Options
+
+| Option | Default | Description |
+| -- | -- | -- |
+| `-f --filename=path` | - | The path to the [YAML set](#yaml-input) or `-` to read from standard input.
+| `-R --repo=url` | - | Docker base repository URL to wich the images will be pushed [$KLO_DOCKER_REPO]
+| `-L` | - | Load into images to [local docker daemon](#with-minikube).
+
+#### Resolve Examples
+
+    klo resolve -f manifest.yaml
+
+    klo resolve -f- < manifest.yaml
+
+    klo resolve -f manifests/
+
+    klo resolve --repo quay.io -f manifests/
+
+    klo resolve --local -f manifests/
+
+### `klo apply [options]`
+
+Auxiliary command to invoke [kubectl](https://github.com/kubernetes/kubectl) with the output of `klo resolve`.
+
+#### Apply Options
+
+The expected options are the same of `klo resolve` command plus the options expected by [kubectl apply](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#apply) command.
+
+#### Apply Examples
+
+    klo apply -f manifests/ --serve-side=true --prune=true -l app=web
 
 ## Klo URIs
 
@@ -109,6 +147,14 @@ Publish is the process of taking a built project and publish it as a container i
 ### `:uberjar` publisher
 
 Takes the path of the build project's uberjar then creates a JVM-based image with `java -jar <uberjar>` as entrypoint, then publishes the image to a repository. The repository can be a remote registry or a [local one](#with-minikube).
+
+## YAML Input
+
+Where YAML input is expected, the available inputs are:
+
+- YAML document: The path to a single file containing a single YAML document.
+- YAML document set: The path to a single file containing multiple YAML documents [separated by](https://yaml.org/spec/1.0/#id2489959) `---`.
+- YAML directory: The path to a directory containing YAML documents. The files into this directory are read recursivelly, depth first, the order is not guaranted.
 
 ### Bugs
 
