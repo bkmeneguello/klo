@@ -5,7 +5,7 @@
             [clojure.java.shell :as shell]
             [clojure.java.io :as io]
             [clojure.string :as str]
-            [clojure.tools.logging :as log])
+            [klo.logging :as log])
   (:import (clojure.lang Keyword)
            (java.nio.file Path)
            (java.io IOException)

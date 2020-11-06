@@ -1,9 +1,8 @@
 (ns klo.core
   (:gen-class)
-  (:require [cli-matic.core :as cli]
-            [klo.command.core :as cmd])
-  (:import (ch.qos.logback.classic Level)
-           (org.slf4j LoggerFactory)))
+  (:require [klo.command.core :as cmd]
+            [klo.logging :as logging]
+            [cli-matic.core :as cli]))
 
 (def ^:private local-option
   {:as "Load into images to local docker daemon."
@@ -136,18 +135,10 @@
   [args]
   (let [commandline (:commandline (cli/parse-command-line args CONFIGURATION))
         quiet (:quiet commandline)
-        verbosity (:verbosity commandline)
-        level (cond
-                (or quiet (= verbosity 0)) (Level/OFF)
-                (= verbosity 1) (Level/ERROR)
-                (= verbosity 2) (Level/WARN)
-                (= verbosity 3) (Level/INFO)
-                (= verbosity 4) (Level/DEBUG)
-                (= verbosity 5) (Level/TRACE)
-                :else (Level/ALL))]
-    (-> (LoggerFactory/getILoggerFactory)
-        (.getLogger "ROOT")
-        (.setLevel level))))
+        verbosity (:verbosity commandline)]
+    (if quiet
+      (logging/disable)
+      (logging/setup verbosity))))
 
 (defn -main
   [& args]

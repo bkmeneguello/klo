@@ -2,9 +2,9 @@
   (:require [klo.config :as config]
             [klo.leiningen :as lein]
             [klo.util :refer [->image as-symbol sha256]]
+            [klo.logging :as log]
             [ike.cljj.file :as fs]
             [clojure.java.shell :as shell]
-            [clojure.tools.logging :as log]
             [clojure.string :as str])
   (:import (org.apache.commons.validator.routines UrlValidator)
            (java.net URI)

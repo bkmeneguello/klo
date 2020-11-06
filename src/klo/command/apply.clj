@@ -3,7 +3,7 @@
   (:require [klo.command.resolve :as resolve]
             [clojure.string :as str]
             [clojure.java.shell :as shell]
-            [clojure.tools.logging :as log]))
+            [klo.logging :as log]))
 
 (def ^:private kubectl-keys
   #{:all

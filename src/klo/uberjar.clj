@@ -1,7 +1,7 @@
 (ns klo.uberjar
   (:require [klo.util :refer [->image]]
             [ike.cljj.file :as fs]
-            [clojure.tools.logging :as log])
+            [klo.logging :as log])
   (:import (com.google.cloud.tools.jib.api Containerizer ImageReference Jib RegistryImage DockerDaemonImage)
            (com.google.cloud.tools.jib.api.buildplan AbsoluteUnixPath FileEntriesLayer)
            (com.google.cloud.tools.jib.event.events ProgressEvent)
