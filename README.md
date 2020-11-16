@@ -12,7 +12,7 @@ The package is distributed as a standalone executable JAR file. This command is 
 
     java -jar klo-0.1.0-standalone.jar [args]
 
-#### Global Options
+### Global Options
 
 | Option | Default | Description |
 | -- | -- | -- |
@@ -77,11 +77,11 @@ Auxiliary command to invoke [kubectl](https://github.com/kubernetes/kubectl) wit
 
 #### Apply Options
 
-The expected options are the same of `klo resolve` command plus the options expected by [kubectl apply](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#apply) command.
+The expected options are the same of `klo resolve` command plus the options expected by [kubectl apply](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#apply) command. Ensure that kubectl options are separated using `--` following [POSIX Chapter 12.02, Guideline 10](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02)
 
 #### Apply Examples
 
-    klo apply -f manifests/ --serve-side=true --prune=true -l app=web
+    klo apply -f manifests/ -- --server-side=true --prune=true -l app=web
 
 ## Klo URIs
 

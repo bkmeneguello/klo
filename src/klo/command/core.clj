@@ -14,22 +14,22 @@
 (defn publish
   "Builds and publishes images for the path passed as an argument.
    It prints the image digest after it is published."
-  [opts]
+  [opts & _]
   (config/with-config
     (-> opts
         publish/execute
         print-image)))
 
 (defn resolve
-  [opts]
+  [opts & _]
   (config/with-config
     (-> opts
         resolve/execute
         println)))
 
 (defn apply
-  [opts]
+  [opts & {:keys [args]}]
   (config/with-config
     (-> opts
-        apply/execute
+        (apply/execute args)
         println)))

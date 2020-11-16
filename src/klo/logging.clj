@@ -17,9 +17,9 @@
         (.getLogger "ROOT")
         (.setLevel level))))
 
-(defn disable
-  []
-  (setup 0))
+(defmacro trace
+  [& args]
+  `(logging/trace ~@args))
 
 (defmacro debug
   [& args]
@@ -29,6 +29,22 @@
   [& args]
   `(logging/info ~@args))
 
+(defmacro warn
+  [& args]
+  `(logging/warn ~@args))
+
+(defmacro error
+  [& args]
+  `(logging/error ~@args))
+
+(defmacro fatal
+  [& args]
+  `(logging/fatal ~@args))
+
+(defmacro tracef
+  [& args]
+  `(logging/tracef ~@args))
+
 (defmacro debugf
   [& args]
   `(logging/debugf ~@args))
@@ -36,3 +52,15 @@
 (defmacro infof
   [& args]
   `(logging/infof ~@args))
+
+(defmacro warnf
+  [& args]
+  `(logging/warnf ~@args))
+
+(defmacro errorf
+  [& args]
+  `(logging/errorf ~@args))
+
+(defmacro fatalf
+  [& args]
+  `(logging/fatalf ~@args))
