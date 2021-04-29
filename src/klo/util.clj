@@ -23,7 +23,7 @@
   String
   (as-string [s] s)
   Symbol
-  (as-string [s] (str/join "/" ((juxt namespace name) s)))
+  (as-string [s] (str/join "/" (remove nil? ((juxt namespace name) s))))
   ImageReference
   (as-string [i] (.toStringWithQualifier i)))
 
